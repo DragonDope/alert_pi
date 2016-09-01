@@ -6,17 +6,13 @@ import RPi.GPIO as GPIO
 import email_alarm
 from ConfigParser import SafeConfigParser
 
-def main():
-	init()
-	Loop()
-
 def init():
 
-	# Einstellungen abrufenund setzen
-	#--------------------------------
+	# Einstellungen abrufen und setzen
+	#---------------------------------
 
         config = SafeConfigParser()
-        config.read('alert.conf')
+        config.read('./alert.conf')
 
 	email = config.getboolean('alert', 'email')			# Soll eine Alarm- E-Mail versendet werden?
 	telefon = config.getboolean('alert', 'telefon')			# Soll ein Alarmanruf ausgeführt werden
@@ -52,9 +48,10 @@ def init():
 	GPIO.setup(OUT_03, GPIO.OUT)                                    # GPIO PIN einstellen
 
 
-def Loop():
-
-	while(true):
+def main():
+	
+	init()								# Unterprogramm init aufrufen
+	while(true):							#Loop
 		# Zusänder der Eingänge abrufen
 		#------------------------------
 		zeit = time.strftime("%Y-%m-%d;%X")				# Aktuelle Systemzeit einlesen
