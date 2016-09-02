@@ -62,20 +62,22 @@ def main():
 		zeit = time.strftime("%Y-%m-%d;%X")				# Aktuelle Systemzeit einlesen
 		
 		if GPIO.event_detected(IN_01):					# Auslöser
-			save_log(name_IN_01)					# Log eintragen
+			save_log(zeit, name_IN_01)				# Log eintragen
                 if GPIO.event_detected(IN_02):                                  # Auslöser
-                        save_log(name_IN_02)                                    # Log eintragen
+                        save_log(zeit, name_IN_02)                              # Log eintragen
                 if GPIO.event_detected(IN_03):                                  # Auslöser
-                        save_log(name_IN_03)                                    # Log eintragen
+                        save_log(zeit, name_IN_03)                              # Log eintragen
                 if GPIO.event_detected(IN_04):                                  # Auslöser
-                        save_log(name_IN_04)                                    # Log eintragen
+                        save_log(zeit, name_IN_04)                              # Log eintragen
 
 		time.sleep(0.5)							#Wartezeit bis die Schleifen ein weiters mal durchlaufen wird
 
 
-def save_log(name):
+def save_log(time, name):
 	file = open(logfile,"a")						# Datei öffnen
-	file.write(str(zeit) + ";" + name + "\n")				# Daten in Datei speichern
+	file.write(str(time) + ";" + name + "\n")				# Daten in Datei speichern
+	file.close()								# Datei schließen
+	print str(time) + " " + name + " wurde ausgelöst"
 
 
 def Result():
