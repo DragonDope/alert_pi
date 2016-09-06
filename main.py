@@ -6,12 +6,18 @@ import RPi.GPIO as GPIO
 import email_alarm
 from ConfigParser import SafeConfigParser
 import re
+import os
 
 
 # Einstellungen abrufen und setzen
 #---------------------------------
+config_file = "alert.conf"
+
+path = os.path.dirname(os.path.abspath(__file__)) 		# Pfad der aktuellen Datei
+path_config_file = "%s/%s" %(path, config_file) 		# Pfad und Dateiname für die Tempdatei
+
 config = SafeConfigParser()
-config.read('./alert.conf')
+config.read(path_config_file)
 
 email = config.getboolean('alert', 'email')			# Soll eine Alarm- E-Mail versendet werden?
 telefon = config.getboolean('alert', 'telefon')			# Soll ein Alarmanruf ausgeführt werden
@@ -51,44 +57,51 @@ for section in outputs:
 
 
 def main():
-	
-#        GPIO.add_event_detect(IN_01, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
-#        GPIO.add_event_detect(IN_02, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
-#        GPIO.add_event_detect(IN_03, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
-#        GPIO.add_event_detect(IN_04, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
-#        GPIO.add_event_detect(IN_05, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
-#        GPIO.add_event_detect(IN_06, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
-#        GPIO.add_event_detect(IN_07, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
-#        GPIO.add_event_detect(IN_08, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
+
+	try:	
+		print (time.strftime("%Y-%m-%d %H:%M ") + "Alert_pi gestartet") # Textausgabe
+#		GPIO.add_event_detect(IN_01, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
+#        	GPIO.add_event_detect(IN_02, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
+#	        GPIO.add_event_detect(IN_03, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
+#       	GPIO.add_event_detect(IN_04, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
+#       	GPIO.add_event_detect(IN_05, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
+#       	GPIO.add_event_detect(IN_06, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
+#       	GPIO.add_event_detect(IN_07, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
+#       	GPIO.add_event_detect(IN_08, GPIO.RISING)                       # Flankenerkennung für Eingang aktivieren
 
 
-	while(True):							#Loop
-		# Zusände der Eingänge abrufen
-		#------------------------------
-		zeit = time.strftime("%Y-%m-%d;%X")				# Aktuelle Systemzeit einlesen
+		while(True):							#Loop
+			# Zusände der Eingänge abrufen
+			#------------------------------
+			zeit = time.strftime("%Y-%m-%d;%X")				# Aktuelle Systemzeit einlesen
 		
-#		if GPIO.event_detected(IN_01):					# Auslöser
-#			save_log(zeit, name_IN_01)				# Log eintragen
-#                if GPIO.event_detected(IN_02):                                  # Auslöser
-#                        save_log(zeit, name_IN_02)                              # Log eintragen
-#                if GPIO.event_detected(IN_03):                                  # Auslöser
-#                        save_log(zeit, name_IN_03)                              # Log eintragen
-#                if GPIO.event_detected(IN_04):                                  # Auslöser
-#                        save_log(zeit, name_IN_04)                              # Log eintragen
-#                if GPIO.event_detected(IN_05):                                  # Auslöser
-#                        save_log(zeit, name_IN_05)                              # Log eintragen
-#                if GPIO.event_detected(IN_06):                                  # Auslöser
-#                        save_log(zeit, name_IN_06)                              # Log eintragen
-#                if GPIO.event_detected(IN_07):                                  # Auslöser
-#                        save_log(zeit, name_IN_07)                              # Log eintragen
-#                if GPIO.event_detected(IN_08):                                  # Auslöser
-#                        save_log(zeit, name_IN_08)                              # Log eintragen
+#			if GPIO.event_detected(IN_01):					# Auslöser
+#				save_log(zeit, name_IN_01)				# Log eintragen
+#                	if GPIO.event_detected(IN_02):                                  # Auslöser
+#                       	save_log(zeit, name_IN_02)                              # Log eintragen
+#                	if GPIO.event_detected(IN_03):                                  # Auslöser
+#                       	save_log(zeit, name_IN_03)                              # Log eintragen
+#                	if GPIO.event_detected(IN_04):                                  # Auslöser
+#                       	save_log(zeit, name_IN_04)                              # Log eintragen
+#                	if GPIO.event_detected(IN_05):                                  # Auslöser
+#                       	save_log(zeit, name_IN_05)                              # Log eintragen
+#                	if GPIO.event_detected(IN_06):                                  # Auslöser
+#                       	save_log(zeit, name_IN_06)                              # Log eintragen
+#                	if GPIO.event_detected(IN_07):                                  # Auslöser
+#                       	save_log(zeit, name_IN_07)                              # Log eintragen
+#                	if GPIO.event_detected(IN_08):                                  # Auslöser
+#                       	save_log(zeit, name_IN_08)                              # Log eintragen
 
-		for section in inputs:
-			if GPIO.input(int(config._sections[section]["pin"])):		# Auslöser
-				save_log(zeit, config._sections[section]["name"])	# Log eintragen
+			for section in inputs:
+				if GPIO.input(int(config._sections[section]["pin"])):		# Auslöser
+					save_log(zeit, config._sections[section]["name"])	# Log eintragen
 
-		time.sleep(0.5)								#Wartezeit bis die Schleifen ein weiters mal durchlaufen wird
+			time.sleep(config.getfloat('alert', 'time_interval'))			#Wartezeit bis die Schleifen ein weiters mal durchlaufen wird
+
+        except KeyboardInterrupt:                                                       	# Ausnahme, wenn Abbruch durch Strg + C
+                close()                                                            		# GPIOs zurücksetzen
+                print ("\n" + time.strftime("%Y-%m-%d %H:%M ") + "Abbruch durch den Benutzer")  # Textausgabe
+
 
 
 def save_log(time, name):
@@ -119,14 +132,14 @@ def close():
 	# Abschlussprozedur
 	#------------------
 	GPIO.cleanup()							# GPIO Einstellungen zurücksetzen
-	GPIO.remove_event_detect(IN_01)					# Flankenerkennung deaktivieren
-	GPIO.remove_event_detect(IN_02)                                 # Flankenerkennung deaktivieren
-	GPIO.remove_event_detect(IN_03)                                 # Flankenerkennung deaktivieren
-	GPIO.remove_event_detect(IN_04)                                 # Flankenerkennung deaktivieren
-        GPIO.remove_event_detect(IN_05)                                 # Flankenerkennung deaktivieren
-        GPIO.remove_event_detect(IN_06)                                 # Flankenerkennung deaktivieren
-        GPIO.remove_event_detect(IN_07)                                 # Flankenerkennung deaktivieren
-        GPIO.remove_event_detect(IN_08)                                 # Flankenerkennung deaktivieren
+#	GPIO.remove_event_detect(IN_01)					# Flankenerkennung deaktivieren
+#	GPIO.remove_event_detect(IN_02)                                 # Flankenerkennung deaktivieren
+#	GPIO.remove_event_detect(IN_03)                                 # Flankenerkennung deaktivieren
+#	GPIO.remove_event_detect(IN_04)                                 # Flankenerkennung deaktivieren
+#       GPIO.remove_event_detect(IN_05)                                 # Flankenerkennung deaktivieren
+#       GPIO.remove_event_detect(IN_06)                                 # Flankenerkennung deaktivieren
+#       GPIO.remove_event_detect(IN_07)                                 # Flankenerkennung deaktivieren
+#       GPIO.remove_event_detect(IN_08)                                 # Flankenerkennung deaktivieren
 
 
 
